@@ -1,3 +1,10 @@
+'''**********************************
+*                                   *
+*       Code by Etienne Naude       *
+*                                   *
+**********************************'''
+
+#import and global variables
 from random import seed
 from random import random
 from random import randint
@@ -8,6 +15,8 @@ squares=[]
 ID = 0
 total_rounds = 100000000
 current_round = 0
+
+#class structure for squares(tiles) on the board
 class square:
     global ID
     name = ""
@@ -40,12 +49,15 @@ class square:
         self.get_prob()
         return "** {}: {}% \t: {} **".format(self.ID_num,self.probality, self.name)
 
+#class structure for chance and community chest cards
 class card:
     title =""
     move = None
 
+#initailize the game, set up card and 
 def setup():
     global current,chest,chance,squares,ID
+    #creates "deck" of community chest and chance cards
     for i in range(17):
         chance.append(card())
         chest.append(card())
@@ -64,6 +76,7 @@ def setup():
     chest[0].move=0
     chest[1].move=10
 
+    #creates board squares
     for i in range(40):
         squares.append(square())
 
@@ -84,35 +97,29 @@ def setup():
     squares[15].set("rail","rail")
     squares[25].set("rail","rail")
     squares[35].set("rail","rail")
-    '''
-    for i in range(len(squares)):
-        if i %10 == 0:
-            print()
-            print()
-        print(squares[i])
 
-    '''
-
+#function to "roll the dice"
 def roll():
     global current
     a = randint(1,6)
     b = randint(1,6)
     count = 0
     total = a+b
-    while a == b:
+    while a == b:                               #while doubles
         count +=1
         a = randint(1,6)
         b = randint(1,6)
         total += a+b
         if count ==3:
             current = 10
-            return 0
+            return 0                            #3 doubles
     if current + total >=40:
         current += (total - 40)
         return total
     current +=total
     return total
 
+#function to analyse dice rolls
 def analysis():
     num = 100000000
     count = []
@@ -131,6 +138,7 @@ def analysis():
     for i in per:
         print(i)
 
+#pick a chance card (community chest is much easier)
 def pick_chance():
     global chance, current
     picked = chance[randint(0,16)].move 
@@ -160,13 +168,14 @@ def pick_chance():
     else:                                       #move to place 
         current = picked
 
+#"play" a game of monopoly containing total_rounds of moves
 def play():
     global current,squares,chest,chance,current_round,total_rounds
     for current_round in range(total_rounds):
-        roll()
-        token = squares[current]
+        roll()                                      #roll the dice
+        token = squares[current]                    #set the postiion to the current square
         if token.modifier != 0:
-            if token.modifier == "chest":
+            if token.modifier == "chest":           #see if the current square has a spcail action assosaited with it eg chance, goto jail etc
                 picked = chest[randint(0,16)].move 
                 if picked == None:
                     pass
@@ -176,8 +185,13 @@ def play():
                 pick_chance()
             if token.modifier == "jail":
                 current =10
-        squares[current].inc()
+        squares[current].inc()                      #increase the count for the times ended a turn on a square
+
     for j in range(40):
-        print(squares[j].get_prob())
+        print(squares[j].get_prob())                #print the probabilty of landing on each square.
+
 setup()
+
+#comment out on the the 2 following lines
 analysis()
+#play()
